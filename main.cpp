@@ -1,7 +1,49 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
+#include <unordered_map>
 using namespace std;
+/*Inicio del Separadores y sus operaciones*/
+typedef struct _Separadores{
+    char separador;
+    _Separadores * siguiente = NULL;
+}Separadores;
+/*-------------------------------------*/
+
+/*Inicio del Lexicon y sus operaciones*/
+typedef struct _Lexicon{
+    unordered_map<string,int> TablaHash;
+}Lexicon;
+Lexicon raiz;
+bool EncontrarPalabra(string palabra){
+    unordered_map<string,int>::const_iterator encontro = raiz.TablaHash.find(palabra);
+    if (encontro == raiz.TablaHash.end()){
+        return false;
+    }
+    else{
+        return true;
+    }
+}
+void DevuelveHash(){
+    for (pair<string, int> encontro : raiz.TablaHash) {
+        cout << encontro.first << " con " << encontro.second << " ocurrencias" << endl;
+    }
+    return;
+}
+void AgregarOcurrencia(string palabra){
+    auto puntero = raiz.TablaHash.find(palabra);
+    puntero->second = puntero->second+1;
+    return;
+}
+void InsertarPalabra(string palabra){
+    raiz.TablaHash.insert({palabra,1});
+}
+void RemuevePalabra(string palabra){
+    raiz.TablaHash.erase(palabra);
+}
+/*-------------------------------------*/
+
+/*Inicio del Histograma y sus operaciones*/
 typedef struct _Histograma{
     int cantidad;
     char letra;
@@ -63,6 +105,7 @@ void VaciaHisto(){
         return;
     }
 }
+/*-------------------------------------*/
 string lectura_archivo(){
     ifstream archivo;
     string texto;
