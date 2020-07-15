@@ -1,3 +1,4 @@
+
 #include <iostream>
 #include <sstream>
 #include <fstream>
@@ -105,6 +106,46 @@ void VaciaHisto(){
         return;
     }
 }
+void imprimeHistograma(){
+    int cantMax = 0;
+    int cantMaxLetras = 0;
+    char palabras[200];
+    char cantidades[200];
+    Histograma * recorrido = primero;
+    while (true){
+        if(recorrido->cantidad > 0){
+            if(recorrido->cantidad > cantMax){
+                cantMax = recorrido->cantidad;
+            }
+            palabras[cantMaxLetras] = recorrido->letra;
+            cantidades[cantMaxLetras] = recorrido->cantidad;
+            cantMaxLetras++;
+        }
+        if (recorrido->siguiente == NULL){
+            break;
+        }
+        recorrido = recorrido->siguiente;
+    }
+    for(int i = cantMax + 1; i > 0; --i ){
+        cout << i << " |";
+        for(int j = 0; j < cantMaxLetras; j++){
+            if(cantidades[j] >= i){
+                cout << "*";
+            }
+            cout << "\t";
+        }
+        cout << "\n";
+    }
+    cout << "  |";
+    for(int f = 0; f < (cantMaxLetras * 8); f++ ){
+        cout << "-" ;
+    }
+    cout << "\n" << "  |";
+    for(int h = 0; h <= cantMaxLetras; h++){
+        cout << palabras[h] << "\t" ;
+    }
+
+}
 /*-------------------------------------*/
 string lectura_archivo(){
     ifstream archivo;
@@ -167,6 +208,7 @@ void procesamiento_de_texto(int respuesta1, int respuesta2){
                 InsertaHisto(texto[i]);
             }
         }
+        imprimeHistograma();
         RetornaHisto();
     }
     else if (respuesta1 == 0 && respuesta2 == 0){
@@ -175,6 +217,7 @@ void procesamiento_de_texto(int respuesta1, int respuesta2){
                 InsertaHisto(tolower(texto[i]));
             }
         }
+        imprimeHistograma();
         RetornaHisto();
     }
     else if (respuesta1 ==1 && respuesta2 == 0){
@@ -183,6 +226,7 @@ void procesamiento_de_texto(int respuesta1, int respuesta2){
                 InsertaHisto(tolower(texto[i]));
             }
         }
+        imprimeHistograma();
         RetornaHisto();
     } else{
         for (int i = 0; i<texto.size(); i++){
@@ -190,9 +234,11 @@ void procesamiento_de_texto(int respuesta1, int respuesta2){
                 InsertaHisto(texto[i]);
             }
         }
+        imprimeHistograma();
         RetornaHisto();
     }
 }
+
 void menu_opciones(int opcion){
     int resp1;
     int resp2;
