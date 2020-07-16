@@ -3,6 +3,9 @@
 #include <sstream>
 #include <fstream>
 #include <unordered_map>
+#include <curses.h>
+#include <vector>
+#include <algorithm>
 using namespace std;
 /*Inicio del Separadores y sus operaciones*/
 typedef struct _Separadores{
@@ -107,17 +110,18 @@ void VaciaHisto(){
     }
 }
 void imprimeHistograma(){
+    cout << "\n";
     int cantMax = 0;
     int cantMaxLetras = 0;
-    char palabras[200];
-    char cantidades[200];
+    vector<char> palabras;
+    int cantidades[200];
     Histograma * recorrido = primero;
     while (true){
         if(recorrido->cantidad > 0){
             if(recorrido->cantidad > cantMax){
                 cantMax = recorrido->cantidad;
             }
-            palabras[cantMaxLetras] = recorrido->letra;
+            palabras.push_back(recorrido->letra);
             cantidades[cantMaxLetras] = recorrido->cantidad;
             cantMaxLetras++;
         }
@@ -126,6 +130,7 @@ void imprimeHistograma(){
         }
         recorrido = recorrido->siguiente;
     }
+
     for(int i = cantMax + 1; i > 0; --i ){
         cout << i << " |";
         for(int j = 0; j < cantMaxLetras; j++){
@@ -137,13 +142,15 @@ void imprimeHistograma(){
         cout << "\n";
     }
     cout << "  |";
+    sort(begin(palabras), end(palabras));
     for(int f = 0; f < (cantMaxLetras * 8); f++ ){
         cout << "-" ;
     }
     cout << "\n" << "  |";
-    for(int h = 0; h <= cantMaxLetras; h++){
-        cout << palabras[h] << "\t" ;
+    for(int h = 0; h < cantMaxLetras; h++){
+        cout << palabras.at(h) << "\t" ;
     }
+    cout << "\n" << "\n";
 
 }
 /*-------------------------------------*/
@@ -164,16 +171,85 @@ string lectura_archivo(){
     archivo.close();
     return texto;
 }
+void escritura_archivo(){
+    ofstream archivo;
+    archivo.open("salida.txt", ios::out);
+
+    if (archivo.fail()) {
+        cout << "No se pudo abrir el archivo" << endl;
+        exit(1);
+    }
+    archivo << "\n";
+    int cantMax = 0;
+    int cantMaxLetras = 0;
+    vector<char> palabras;
+    char cantidades[200];
+    Histograma * recorrido = primero;
+    while (true){
+        if(recorrido->cantidad > 0){
+            if(recorrido->cantidad > cantMax){
+                cantMax = recorrido->cantidad;
+            }
+            palabras.push_back(recorrido->letra);
+            cantidades[cantMaxLetras] = recorrido->cantidad;
+            cantMaxLetras++;
+        }
+        if (recorrido->siguiente == NULL){
+            break;
+        }
+        recorrido = recorrido->siguiente;
+    }
+    sort(begin(palabras), end(palabras));
+    for(int i = cantMax + 1; i > 0; --i ){
+        archivo << i << " |";
+        for(int j = 0; j < cantMaxLetras; j++){
+            if(cantidades[j] >= i){
+                archivo << "*";
+            }
+            archivo << "\t";
+        }
+        archivo << "\n";
+    }
+    archivo << "  |";
+    for(int f = 0; f < (cantMaxLetras * 8); f++ ){
+        archivo << "-" ;
+    }
+    archivo << "\n" << "  |";
+    for(int h = 0; h <= cantMaxLetras; h++){
+        archivo << palabras.at(h) << "\t";
+    }
+    archivo << "\n" << "\n";
+}
 void procesamiento_de_estandar(int respuesta1, int respuesta2){
+    erase();
     string texto;
-    cout << "Digite el texto a ser procesado" << endl;
-    cin >> noskipws >> texto;
+    int  maxX;
+    char ch, entero;
+
+    initscr();			/* Empieza el modo curses		*/
+    raw();				/* Line buffering inhabilitado	*/
+    keypad(stdscr, TRUE);		/* Los tipo F1 no tiran el programa*/
+    maxX= getmaxx(stdscr);
+    printw("Digite el texto a ser procesado y digite 1 para terminar\n");
+    while(true) {
+        ch = getch();       //obtenemos un carácter
+        texto.push_back(ch);
+        if(ch == '1') {
+            texto.pop_back();
+            break;
+        }
+    }
+    refresh();
+    //Esperamos un input para terminar la ventana
+    entero = getch();
+    endwin(); //Cerramos la ventana
     if (respuesta1 == 0 && respuesta2 == 1){
         for (int i = 0; i<texto.size(); i++){
             if (texto[i] != ' ') {
                 InsertaHisto(texto[i]);
             }
         }
+        escritura_archivo();
         RetornaHisto();
     }
     else if (respuesta1 == 0 && respuesta2 == 0){
@@ -182,6 +258,7 @@ void procesamiento_de_estandar(int respuesta1, int respuesta2){
                 InsertaHisto(tolower(texto[i]));
             }
         }
+        escritura_archivo();
         RetornaHisto();
     }
     else if (respuesta1 ==1 && respuesta2 == 0){
@@ -190,6 +267,7 @@ void procesamiento_de_estandar(int respuesta1, int respuesta2){
                 InsertaHisto(tolower(texto[i]));
             }
         }
+        imprimeHistograma();
         RetornaHisto();
     } else{
         for (int i = 0; i<texto.size(); i++){
@@ -197,6 +275,7 @@ void procesamiento_de_estandar(int respuesta1, int respuesta2){
                 InsertaHisto(texto[i]);
             }
         }
+        imprimeHistograma();
         RetornaHisto();
     }
 }
@@ -208,7 +287,7 @@ void procesamiento_de_texto(int respuesta1, int respuesta2){
                 InsertaHisto(texto[i]);
             }
         }
-        imprimeHistograma();
+        escritura_archivo();
         RetornaHisto();
     }
     else if (respuesta1 == 0 && respuesta2 == 0){
@@ -217,7 +296,7 @@ void procesamiento_de_texto(int respuesta1, int respuesta2){
                 InsertaHisto(tolower(texto[i]));
             }
         }
-        imprimeHistograma();
+        escritura_archivo();
         RetornaHisto();
     }
     else if (respuesta1 ==1 && respuesta2 == 0){
