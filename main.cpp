@@ -318,7 +318,7 @@ void procesamiento_de_estandar(int respuesta1, int respuesta2){
     endwin(); //Cerramos la ventana
     if (respuesta1 == 0 && respuesta2 == 1){
         for (int i = 0; i<texto.size(); i++){
-            if (texto[i] != ' ') {
+            if (not EsSeparador(texto[i])) {
                 InsertaHisto(texto[i]);
             }
         }
