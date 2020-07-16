@@ -12,6 +12,79 @@ typedef struct _Separadores{
     char separador;
     _Separadores * siguiente = NULL;
 }Separadores;
+Separadores * primerosep;
+void InsertaSep(char separador){
+    if (primerosep == NULL){
+        primerosep = new Separadores ();
+        primerosep->separador = separador;
+        return;
+    }
+    else{
+        Separadores *recorrido = primerosep;
+        while (true) {
+            if (recorrido->separador == separador){
+                break;
+            }
+            else if (recorrido->siguiente == NULL) {
+                recorrido->siguiente = new Separadores ();
+                recorrido->siguiente->separador = separador;
+                break;
+            }
+            recorrido = recorrido->siguiente;
+        }
+        return;
+    }
+}
+void RemueveSep(char separador){
+    Separadores *recorrido = primerosep;
+    Separadores *temp;
+    while (true) {
+        if (recorrido->separador == separador && recorrido == primerosep){
+            primerosep = recorrido->siguiente;
+            free(recorrido);
+            return;
+        }
+        else if(recorrido->siguiente->separador == separador){
+            temp = recorrido->siguiente;
+            recorrido->siguiente = recorrido->siguiente->siguiente;
+            free(temp);
+            return;
+        }
+        else if (recorrido->siguiente == NULL) {
+            return;
+        }
+        recorrido = recorrido->siguiente;
+    }
+    return;
+}
+bool EsSeparador(char revisar){
+    Separadores *recorrido = primerosep;
+    while (true) {
+        if (recorrido->separador == revisar){
+            return true;
+        }
+        else if (recorrido->siguiente == NULL) {
+            return false;
+        }
+        recorrido = recorrido->siguiente;
+    }
+}
+void SeparadoresActuales(){
+    Separadores *recorrido = primerosep;
+    string mensaje = "Los separadores actuales son: ";
+    string tempmensaje = "'";
+    while (true) {
+        tempmensaje.push_back(recorrido->separador);
+        tempmensaje = tempmensaje + "'";
+        mensaje = mensaje + tempmensaje +" ";
+        tempmensaje = "'";
+        if (recorrido->siguiente == NULL) {
+            cout << mensaje << endl;
+            return;
+        }
+        recorrido = recorrido->siguiente;
+    }
+}
 /*-------------------------------------*/
 
 /*Inicio del Lexicon y sus operaciones*/
@@ -254,7 +327,7 @@ void procesamiento_de_estandar(int respuesta1, int respuesta2){
     }
     else if (respuesta1 == 0 && respuesta2 == 0){
         for (int i = 0; i<texto.size(); i++){
-            if (texto[i] != ' ') {
+            if (not EsSeparador(texto[i])) {
                 InsertaHisto(tolower(texto[i]));
             }
         }
@@ -263,7 +336,7 @@ void procesamiento_de_estandar(int respuesta1, int respuesta2){
     }
     else if (respuesta1 ==1 && respuesta2 == 0){
         for (int i = 0; i<texto.size(); i++){
-            if (texto[i] != ' ') {
+            if (not EsSeparador(texto[i])) {
                 InsertaHisto(tolower(texto[i]));
             }
         }
@@ -271,7 +344,7 @@ void procesamiento_de_estandar(int respuesta1, int respuesta2){
         RetornaHisto();
     } else{
         for (int i = 0; i<texto.size(); i++){
-            if (texto[i] != ' ') {
+            if (not EsSeparador(texto[i])) {
                 InsertaHisto(texto[i]);
             }
         }
@@ -283,7 +356,7 @@ void procesamiento_de_texto(int respuesta1, int respuesta2){
     string texto = lectura_archivo();
     if (respuesta1 == 0 && respuesta2 == 1){
         for (int i = 0; i<texto.size(); i++){
-            if (texto[i] != ' ') {
+            if (not EsSeparador(texto[i])) {
                 InsertaHisto(texto[i]);
             }
         }
@@ -292,7 +365,7 @@ void procesamiento_de_texto(int respuesta1, int respuesta2){
     }
     else if (respuesta1 == 0 && respuesta2 == 0){
         for (int i = 0; i<texto.size(); i++){
-            if (texto[i] != ' ') {
+            if (not EsSeparador(texto[i])) {
                 InsertaHisto(tolower(texto[i]));
             }
         }
@@ -301,7 +374,7 @@ void procesamiento_de_texto(int respuesta1, int respuesta2){
     }
     else if (respuesta1 ==1 && respuesta2 == 0){
         for (int i = 0; i<texto.size(); i++){
-            if (texto[i] != ' ') {
+            if (not EsSeparador(texto[i])) {
                 InsertaHisto(tolower(texto[i]));
             }
         }
@@ -309,7 +382,7 @@ void procesamiento_de_texto(int respuesta1, int respuesta2){
         RetornaHisto();
     } else{
         for (int i = 0; i<texto.size(); i++){
-            if (texto[i] != ' ') {
+            if (not EsSeparador(texto[i])) {
                 InsertaHisto(texto[i]);
             }
         }
@@ -336,13 +409,30 @@ void menu_opciones(int opcion){
         procesamiento_de_estandar(resp1,resp2);
     }
 }
+void InsertarSeparador(){
+    char sep;
+    SeparadoresActuales();
+    cout << "Digite el separador a ser añadido" << endl;
+    cin >> sep;
+    InsertaSep(sep);
+}
+void RemoverSeparador(){
+    char sep;
+    SeparadoresActuales();
+    cout << "Digite el separador a ser removido" << endl;
+    cin >> sep;
+    RemueveSep(sep);
+}
 int main() {
     char respuesta;
+    InsertaSep(' ');
     do {
         cout << "Digite la opcion que desea realizar" << endl;
         cout << "1-Digite para procesar desde la salida estandar" << endl;
         cout << "2-Digite para procesar desde un archivo de texto" << endl;
-        cout << "3-Digite para salir" << endl;
+        cout << "3-Digite para ingresar un separador" << endl;
+        cout << "4-Digite para remover un separador" << endl;
+        cout << "5-Digite para salir" << endl;
         cin >> respuesta;
         string palabra;
         string oracion;
@@ -356,6 +446,12 @@ int main() {
                 menu_opciones(0);
                 break;
             case '3':
+                InsertarSeparador();
+                break;
+            case '4':
+                RemoverSeparador();
+                break;
+            case '5':
                 cout << "Saliendo gracias!" << endl;
                 exit(1);
             default:
