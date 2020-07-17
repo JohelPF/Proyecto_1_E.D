@@ -610,6 +610,6 @@ int main() {
                 cout << "El numero digitado no corresponde a ninguna opcion" << endl;
                 break;
         }
-    }while (respuesta != 5);
+    }while (respuesta != 7);
     return 0;
 }
