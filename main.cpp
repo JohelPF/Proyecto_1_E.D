@@ -6,7 +6,7 @@
 #include <curses.h>
 #include <vector>
 #include <algorithm>
-#include <ctime.h>
+#include <ctime>
 #include <set>
 using namespace std;
 double tiempo;
