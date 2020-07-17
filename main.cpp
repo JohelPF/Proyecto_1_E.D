@@ -6,7 +6,30 @@
 #include <curses.h>
 #include <vector>
 #include <algorithm>
+#include <set>
 using namespace std;
+/*Inicio del las palabras no delimitadoras y sus operaciones*/
+typedef struct _Nodelim{
+    set<string> tree;
+}Nodelim;
+Nodelim PalabrasNoDelimitadoras;
+bool BuscaNodelim(string word){
+    set<string>::iterator it;
+    for (it=PalabrasNoDelimitadoras.tree.begin(); it != PalabrasNoDelimitadoras.tree.end(); it++){
+        if (*it == word){
+            return true;
+        }
+    }
+    return false;
+}
+void InsertaNodelim(string word){
+    PalabrasNoDelimitadoras.tree.insert(word);
+}
+void RemueveNodelim(string word){
+    PalabrasNoDelimitadoras.tree.erase(word);
+}
+/*-------------------------------------*/
+
 /*Inicio del Separadores y sus operaciones*/
 typedef struct _Separadores{
     char separador;
@@ -318,7 +341,66 @@ void procesamiento_de_estandar(int respuesta1, int respuesta2){
     endwin(); //Cerramos la ventana
     if (respuesta1 == 0 && respuesta2 == 1){
         for (int i = 0; i<texto.size(); i++){
+            if (texto[i] != ' ') {
+                InsertaHisto(texto[i]);
+            }
+        }
+        escritura_archivo();
+        RetornaHisto();
+    }
+    else if (respuesta1 == 0 && respuesta2 == 0){
+        for (int i = 0; i<texto.size(); i++){
             if (not EsSeparador(texto[i])) {
+                InsertaHisto(tolower(texto[i]));
+            }
+        }
+        escritura_archivo();
+        RetornaHisto();
+    }
+    else if (respuesta1 ==1 && respuesta2 == 0){
+        for (int i = 0; i<texto.size(); i++){
+            if (not EsSeparador(texto[i])) {
+                InsertaHisto(tolower(texto[i]));
+            }
+        }
+        imprimeHistograma();
+        RetornaHisto();
+    } else{
+        for (int i = 0; i<texto.size(); i++){
+            if (not EsSeparador(texto[i])) {
+                InsertaHisto(texto[i]);
+            }
+        }
+        imprimeHistograma();
+        RetornaHisto();
+    }
+}
+void procesamiento_de_estandar_alpha(int respuesta1, int respuesta2){
+    erase();
+    string texto;
+    int  maxX;
+    char ch, entero;
+
+    initscr();			/* Empieza el modo curses		*/
+    raw();				/* Line buffering inhabilitado	*/
+    keypad(stdscr, TRUE);		/* Los tipo F1 no tiran el programa*/
+    maxX= getmaxx(stdscr);
+    printw("Digite el texto a ser procesado y digite 1 para terminar\n");
+    while(true) {
+        ch = getch();       //obtenemos un carácter
+        texto.push_back(ch);
+        if(ch == '1') {
+            texto.pop_back();
+            break;
+        }
+    }
+    refresh();
+    //Esperamos un input para terminar la ventana
+    entero = getch();
+    endwin(); //Cerramos la ventana
+    if (respuesta1 == 0 && respuesta2 == 1){
+        for (int i = 0; i<texto.size(); i++){
+            if (texto[i] != ' ') {
                 InsertaHisto(texto[i]);
             }
         }
@@ -390,23 +472,75 @@ void procesamiento_de_texto(int respuesta1, int respuesta2){
         RetornaHisto();
     }
 }
+void procesamiento_de_texto_apha(int respuesta1, int respuesta2){
+    string texto = lectura_archivo();
+    if (respuesta1 == 0 && respuesta2 == 1){
+        for (int i = 0; i<texto.size(); i++){
+            if (not EsSeparador(texto[i])) {
+                InsertaHisto(texto[i]);
+            }
+        }
+        escritura_archivo();
+        RetornaHisto();
+    }
+    else if (respuesta1 == 0 && respuesta2 == 0){
+        for (int i = 0; i<texto.size(); i++){
+            if (not EsSeparador(texto[i])) {
+                InsertaHisto(tolower(texto[i]));
+            }
+        }
+        escritura_archivo();
+        RetornaHisto();
+    }
+    else if (respuesta1 ==1 && respuesta2 == 0){
+        for (int i = 0; i<texto.size(); i++){
+            if (not EsSeparador(texto[i])) {
+                InsertaHisto(tolower(texto[i]));
+            }
+        }
+        imprimeHistograma();
+        RetornaHisto();
+    } else{
+        for (int i = 0; i<texto.size(); i++){
+            if (not EsSeparador(texto[i])) {
+                InsertaHisto(texto[i]);
+            }
+        }
+        imprimeHistograma();
+        RetornaHisto();
+    }
+}
 
 void menu_opciones(int opcion){
     int resp1;
     int resp2;
+    int resp;
     if (opcion == 0){
         cout << "Salida: '1' para estandar o '0' para archivo de texto" << endl;
         cin >> resp1;
         cout << "Desesa tomar en cuenta mayusculas? '1' para si y '0' para no" << endl;
         cin >> resp2;
-        procesamiento_de_texto(resp1,resp2);
+        cout << "Desesa utilizar el alfabeto definido e ignorar las demas palabras? '1' para si y '0' para no" << endl;
+        cin >> resp;
+        if (resp == 0) {
+            procesamiento_de_texto(resp1, resp2);
+        }
+        else{
+            procesamiento_de_texto_apha(resp1, resp2);
+        }
     }
     else{
         cout << "Salida: '1' para estandar o '0' para archivo de texto" << endl;
         cin >> resp1;
         cout << "Desesa tomar en cuenta mayusculas? '1' para si y '0' para no" << endl;
         cin >> resp2;
-        procesamiento_de_estandar(resp1,resp2);
+        cout << "Desesa utilizar el alfabeto definido e ignorar las demas palabras? '1' para si y '0' para no" << endl;
+        cin >> resp;
+        if (resp == 0) {
+            procesamiento_de_estandar(resp1, resp2);
+        } else{
+            procesamiento_de_estandar_alpha(resp1, resp2);
+        }
     }
 }
 void InsertarSeparador(){
@@ -423,6 +557,18 @@ void RemoverSeparador(){
     cin >> sep;
     RemueveSep(sep);
 }
+void NewNodelim(){
+    string palabra;
+    cout << "Digite la palabra a ser añadida" << endl;
+    cin >> palabra;
+    InsertaNodelim(palabra);
+}
+void RemNodelim(){
+    string palabra;
+    cout << "Digite la palabra a ser removida" << endl;
+    cin >> palabra;
+    RemueveNodelim(palabra);
+}
 int main() {
     char respuesta;
     InsertaSep(' ');
@@ -432,7 +578,9 @@ int main() {
         cout << "2-Digite para procesar desde un archivo de texto" << endl;
         cout << "3-Digite para ingresar un separador" << endl;
         cout << "4-Digite para remover un separador" << endl;
-        cout << "5-Digite para salir" << endl;
+        cout << "5-Digite para ingresar una palabra la cual no se va a tomar en cuenta como un separador" << endl;
+        cout << "6-Digite para remover una palabra la cual no se va a tomar en cuenta como un separador" << endl;
+        cout << "7-Digite para salir" << endl;
         cin >> respuesta;
         string palabra;
         string oracion;
@@ -452,6 +600,10 @@ int main() {
                 RemoverSeparador();
                 break;
             case '5':
+                NewNodelim();
+            case '6':
+                RemNodelim();
+            case '7':
                 cout << "Saliendo gracias!" << endl;
                 exit(1);
             default:
