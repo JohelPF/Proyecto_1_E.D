@@ -352,7 +352,7 @@ void procesamiento_de_estandar(int respuesta1, int respuesta2){
     while(true) {
         ch = getch();       //obtenemos un carácter
         texto.push_back(ch);
-        if(ch == '10') {
+        if(ch == 10) {
             texto.pop_back();
             break;
         }
@@ -407,18 +407,18 @@ void procesamiento_de_estandar_alpha(int respuesta1, int respuesta2){
     raw();				/* Line buffering inhabilitado	*/
     keypad(stdscr, TRUE);		/* Los tipo F1 no tiran el programa*/
     maxX= getmaxx(stdscr);
-    printw("Digite el texto a ser procesado y digite 1 para terminar\n");
+    printw("Digite el texto a ser procesado y digite enter para terminar\n");
     while(true) {
         ch = getch();       //obtenemos un carácter
         texto.push_back(ch);
-        if(ch == '1') {
+        if(ch == 10) {
             texto.pop_back();
             break;
         }
     }
     refresh();
     //Esperamos un input para terminar la ventana
-    entero = getch();
+    //entero = getch();
     endwin(); //Cerramos la ventana
     if (respuesta1 == 0 && respuesta2 == 1){
         for (int i = 0; i<texto.size(); i++){
