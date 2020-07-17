@@ -8,6 +8,8 @@
 #include <algorithm>
 #include <set>
 using namespace std;
+double tiempo;
+
 /*Inicio del las palabras no delimitadoras y sus operaciones*/
 typedef struct _Nodelim{
     set<string> tree;
@@ -205,12 +207,26 @@ void VaciaHisto(){
         return;
     }
 }
+
+int retorna_cantidad(char letra){
+    Histograma *recorrido = primero;
+    while(true){
+        if(recorrido->letra == letra){
+            return recorrido->cantidad;
+        }
+        if(recorrido->siguiente == NULL){
+            return 0;
+        }
+        recorrido = recorrido->siguiente;
+    }
+}
+
 void imprimeHistograma(){
     cout << "\n";
     int cantMax = 0;
     int cantMaxLetras = 0;
     vector<char> palabras;
-    int cantidades[200];
+    vector<char> cantidades;
     Histograma * recorrido = primero;
     while (true){
         if(recorrido->cantidad > 0){
@@ -218,7 +234,6 @@ void imprimeHistograma(){
                 cantMax = recorrido->cantidad;
             }
             palabras.push_back(recorrido->letra);
-            cantidades[cantMaxLetras] = recorrido->cantidad;
             cantMaxLetras++;
         }
         if (recorrido->siguiente == NULL){
@@ -226,7 +241,10 @@ void imprimeHistograma(){
         }
         recorrido = recorrido->siguiente;
     }
-
+    sort(begin(palabras), end(palabras));
+    for(int i = 0; i < palabras.size(); i++){
+        cantidades.push_back(retorna_cantidad(palabras[i]));
+    }
     for(int i = cantMax + 1; i > 0; --i ){
         cout << i << " |";
         for(int j = 0; j < cantMaxLetras; j++){
@@ -238,7 +256,7 @@ void imprimeHistograma(){
         cout << "\n";
     }
     cout << "  |";
-    sort(begin(palabras), end(palabras));
+
     for(int f = 0; f < (cantMaxLetras * 8); f++ ){
         cout << "-" ;
     }
@@ -279,7 +297,7 @@ void escritura_archivo(){
     int cantMax = 0;
     int cantMaxLetras = 0;
     vector<char> palabras;
-    char cantidades[200];
+    vector<char> cantidades;
     Histograma * recorrido = primero;
     while (true){
         if(recorrido->cantidad > 0){
@@ -287,7 +305,6 @@ void escritura_archivo(){
                 cantMax = recorrido->cantidad;
             }
             palabras.push_back(recorrido->letra);
-            cantidades[cantMaxLetras] = recorrido->cantidad;
             cantMaxLetras++;
         }
         if (recorrido->siguiente == NULL){
@@ -296,6 +313,9 @@ void escritura_archivo(){
         recorrido = recorrido->siguiente;
     }
     sort(begin(palabras), end(palabras));
+    for(int i = 0; i < palabras.size(); i++){
+        cantidades.push_back(retorna_cantidad(palabras[i]));
+    }
     for(int i = cantMax + 1; i > 0; --i ){
         archivo << i << " |";
         for(int j = 0; j < cantMaxLetras; j++){
@@ -311,10 +331,11 @@ void escritura_archivo(){
         archivo << "-" ;
     }
     archivo << "\n" << "  |";
-    for(int h = 0; h <= cantMaxLetras; h++){
+    for(int h = 0; h < cantMaxLetras; h++){
         archivo << palabras.at(h) << "\t";
     }
     archivo << "\n" << "\n";
+    archivo.close();
 }
 void procesamiento_de_estandar(int respuesta1, int respuesta2){
     erase();
@@ -326,18 +347,18 @@ void procesamiento_de_estandar(int respuesta1, int respuesta2){
     raw();				/* Line buffering inhabilitado	*/
     keypad(stdscr, TRUE);		/* Los tipo F1 no tiran el programa*/
     maxX= getmaxx(stdscr);
-    printw("Digite el texto a ser procesado y digite 1 para terminar\n");
+    printw("Digite el texto a ser procesado y digite enter para terminar\n");
     while(true) {
         ch = getch();       //obtenemos un carácter
         texto.push_back(ch);
-        if(ch == '1') {
+        if(ch == '10') {
             texto.pop_back();
             break;
         }
     }
     refresh();
     //Esperamos un input para terminar la ventana
-    entero = getch();
+    //entero = getch();
     endwin(); //Cerramos la ventana
     if (respuesta1 == 0 && respuesta2 == 1){
         for (int i = 0; i<texto.size(); i++){
@@ -512,6 +533,8 @@ void procesamiento_de_texto_apha(int respuesta1, int respuesta2){
 }
 
 void menu_opciones(int opcion){
+    unsigned int t0, t1;
+    t0 = clock();
     int resp1;
     int resp2;
     int resp;
@@ -542,6 +565,8 @@ void menu_opciones(int opcion){
             procesamiento_de_estandar_alpha(resp1, resp2);
         }
     }
+    t1 = clock();
+    tiempo = (double(t1-t0)/CLOCKS_PER_SEC);
 }
 void InsertarSeparador(){
     char sep;
@@ -604,6 +629,7 @@ int main() {
             case '6':
                 RemNodelim();
             case '7':
+                cout << tiempo << endl;
                 cout << "Saliendo gracias!" << endl;
                 exit(1);
             default:
