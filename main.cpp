@@ -1,4 +1,3 @@
-
 #include <iostream>
 #include <sstream>
 #include <fstream>
@@ -144,6 +143,33 @@ void InsertarPalabra(string palabra){
 void RemuevePalabra(string palabra){
     raiz.TablaHash.erase(palabra);
 }
+void Determinar(string palabra){
+    if(EncontrarPalabra(palabra)){
+        AgregarOcurrencia(palabra);
+    }
+    else{
+        InsertarPalabra(palabra);
+    }
+}
+string EncPalabra(string palabra){
+    unordered_map<string,int>::const_iterator encontro = raiz.TablaHash.find(palabra);
+    if (encontro == raiz.TablaHash.end()){
+        return "Esta palabra no se encuentra";
+    }
+    else{
+        return encontro->first;
+    }
+}
+void EncPrefijo(string prefijo, int tamanno){
+    string pal;
+    for (pair<string, int> encontro : raiz.TablaHash) {
+        pal.push_back(encontro.first[tamanno]);
+        if (pal == prefijo) {
+            cout << encontro.first << " con " << encontro.second << " ocurrencias" << endl;
+        }
+    }
+    return;
+}
 /*-------------------------------------*/
 
 /*Inicio del Histograma y sus operaciones*/
@@ -269,6 +295,46 @@ void imprimeHistograma(){
 
 }
 /*-------------------------------------*/
+void MenuSalida(){
+    string respuesta;
+    string palabra;
+    string prefijo;
+    while (true) {
+        cout << "Digite la opcion que desea realizar" << endl;
+        cout << "1-Ver Histograma" << endl;
+        cout << "2-Ver diccionario de palabras/tokens" << endl;
+        cout << "3-Ver diccionario de palabras/tokens con posiciones" << endl;
+        cout << "4-Buscar palabra" << endl;
+        cout << "5-Buscar prefijo" << endl;
+        cout << "6-Ver estadisticas" << endl;
+        cout << "7-Regresar al menu pasado" << endl;
+        cin >> respuesta;
+        if (respuesta == "1")
+            imprimeHistograma();
+        else if (respuesta == "2")
+            DevuelveHash();
+        else if (respuesta == "3")
+            DevuelveHash();
+        else if (respuesta == "4") {
+            cout << "Digite la palabra a buscar" << endl;
+            cin >> palabra;
+            EncPalabra(palabra);
+        }
+        else if (respuesta == "5") {
+            cout << "Digite el prefijo a buscar" << endl;
+            cin >> prefijo;
+            EncPrefijo(prefijo,prefijo.size());
+        }
+        else if (respuesta == "6")
+            ;
+        else if (respuesta == "7")
+            break;
+        else{
+            cout << "Opcion no valida" << endl;
+        }
+    }
+
+}
 string lectura_archivo(){
     ifstream archivo;
     string texto;
@@ -343,6 +409,7 @@ void procesamiento_de_estandar(int respuesta1, int respuesta2){
     string texto;
     int  maxX;
     char ch, entero;
+    string palabra;
 
     initscr();			/* Empieza el modo curses		*/
     raw();				/* Line buffering inhabilitado	*/
@@ -363,8 +430,13 @@ void procesamiento_de_estandar(int respuesta1, int respuesta2){
     endwin(); //Cerramos la ventana
     if (respuesta1 == 0 && respuesta2 == 1){
         for (int i = 0; i<texto.size(); i++){
-            if (texto[i] != ' ') {
+            if (not EsSeparador(texto[i])) {
                 InsertaHisto(texto[i]);
+                palabra.push_back(texto[i]);
+            }
+            else{
+                Determinar(palabra);
+                palabra = "";
             }
         }
         escritura_archivo();
@@ -374,6 +446,11 @@ void procesamiento_de_estandar(int respuesta1, int respuesta2){
         for (int i = 0; i<texto.size(); i++){
             if (not EsSeparador(texto[i])) {
                 InsertaHisto(tolower(texto[i]));
+                palabra.push_back(texto[i]);
+            }
+            else{
+                Determinar(palabra);
+                palabra = "";
             }
         }
         escritura_archivo();
@@ -383,6 +460,11 @@ void procesamiento_de_estandar(int respuesta1, int respuesta2){
         for (int i = 0; i<texto.size(); i++){
             if (not EsSeparador(texto[i])) {
                 InsertaHisto(tolower(texto[i]));
+                palabra.push_back(texto[i]);
+            }
+            else{
+                Determinar(palabra);
+                palabra = "";
             }
         }
         imprimeHistograma();
@@ -391,6 +473,11 @@ void procesamiento_de_estandar(int respuesta1, int respuesta2){
         for (int i = 0; i<texto.size(); i++){
             if (not EsSeparador(texto[i])) {
                 InsertaHisto(texto[i]);
+                palabra.push_back(texto[i]);
+            }
+            else{
+                Determinar(palabra);
+                palabra = "";
             }
         }
         imprimeHistograma();
@@ -402,6 +489,7 @@ void procesamiento_de_estandar_alpha(int respuesta1, int respuesta2){
     string texto;
     int  maxX;
     char ch, entero;
+    string palabra;
 
     initscr();			/* Empieza el modo curses		*/
     raw();				/* Line buffering inhabilitado	*/
@@ -422,8 +510,13 @@ void procesamiento_de_estandar_alpha(int respuesta1, int respuesta2){
     endwin(); //Cerramos la ventana
     if (respuesta1 == 0 && respuesta2 == 1){
         for (int i = 0; i<texto.size(); i++){
-            if (texto[i] != ' ') {
+            if (not EsSeparador(texto[i])) {
                 InsertaHisto(texto[i]);
+                palabra.push_back(texto[i]);
+            }
+            else{
+                Determinar(palabra);
+                palabra = "";
             }
         }
         escritura_archivo();
@@ -433,6 +526,11 @@ void procesamiento_de_estandar_alpha(int respuesta1, int respuesta2){
         for (int i = 0; i<texto.size(); i++){
             if (not EsSeparador(texto[i])) {
                 InsertaHisto(tolower(texto[i]));
+                palabra.push_back(tolower(texto[i]));
+            }
+            else{
+                Determinar(palabra);
+                palabra = "";
             }
         }
         escritura_archivo();
@@ -442,6 +540,11 @@ void procesamiento_de_estandar_alpha(int respuesta1, int respuesta2){
         for (int i = 0; i<texto.size(); i++){
             if (not EsSeparador(texto[i])) {
                 InsertaHisto(tolower(texto[i]));
+                palabra.push_back(tolower(texto[i]));
+            }
+            else{
+                Determinar(palabra);
+                palabra = "";
             }
         }
         imprimeHistograma();
@@ -450,6 +553,11 @@ void procesamiento_de_estandar_alpha(int respuesta1, int respuesta2){
         for (int i = 0; i<texto.size(); i++){
             if (not EsSeparador(texto[i])) {
                 InsertaHisto(texto[i]);
+                palabra.push_back(texto[i]);
+            }
+            else{
+                Determinar(palabra);
+                palabra = "";
             }
         }
         imprimeHistograma();
@@ -458,10 +566,16 @@ void procesamiento_de_estandar_alpha(int respuesta1, int respuesta2){
 }
 void procesamiento_de_texto(int respuesta1, int respuesta2){
     string texto = lectura_archivo();
+    string palabra;
     if (respuesta1 == 0 && respuesta2 == 1){
         for (int i = 0; i<texto.size(); i++){
             if (not EsSeparador(texto[i])) {
                 InsertaHisto(texto[i]);
+                palabra.push_back(texto[i]);
+            }
+            else{
+                Determinar(palabra);
+                palabra = "";
             }
         }
         escritura_archivo();
@@ -471,6 +585,11 @@ void procesamiento_de_texto(int respuesta1, int respuesta2){
         for (int i = 0; i<texto.size(); i++){
             if (not EsSeparador(texto[i])) {
                 InsertaHisto(tolower(texto[i]));
+                palabra.push_back(tolower(texto[i]));
+            }
+            else{
+                Determinar(palabra);
+                palabra = "";
             }
         }
         escritura_archivo();
@@ -480,6 +599,11 @@ void procesamiento_de_texto(int respuesta1, int respuesta2){
         for (int i = 0; i<texto.size(); i++){
             if (not EsSeparador(texto[i])) {
                 InsertaHisto(tolower(texto[i]));
+                palabra.push_back(tolower(texto[i]));
+            }
+            else{
+                Determinar(palabra);
+                palabra = "";
             }
         }
         imprimeHistograma();
@@ -488,6 +612,11 @@ void procesamiento_de_texto(int respuesta1, int respuesta2){
         for (int i = 0; i<texto.size(); i++){
             if (not EsSeparador(texto[i])) {
                 InsertaHisto(texto[i]);
+                palabra.push_back(texto[i]);
+            }
+            else{
+                Determinar(palabra);
+                palabra = "";
             }
         }
         imprimeHistograma();
@@ -496,10 +625,16 @@ void procesamiento_de_texto(int respuesta1, int respuesta2){
 }
 void procesamiento_de_texto_apha(int respuesta1, int respuesta2){
     string texto = lectura_archivo();
+    string palabra;
     if (respuesta1 == 0 && respuesta2 == 1){
         for (int i = 0; i<texto.size(); i++){
             if (not EsSeparador(texto[i])) {
                 InsertaHisto(texto[i]);
+                palabra.push_back(texto[i]);
+            }
+            else{
+                Determinar(palabra);
+                palabra = "";
             }
         }
         escritura_archivo();
@@ -509,6 +644,11 @@ void procesamiento_de_texto_apha(int respuesta1, int respuesta2){
         for (int i = 0; i<texto.size(); i++){
             if (not EsSeparador(texto[i])) {
                 InsertaHisto(tolower(texto[i]));
+                palabra.push_back(tolower(texto[i]));
+            }
+            else{
+                Determinar(palabra);
+                palabra = "";
             }
         }
         escritura_archivo();
@@ -518,6 +658,11 @@ void procesamiento_de_texto_apha(int respuesta1, int respuesta2){
         for (int i = 0; i<texto.size(); i++){
             if (not EsSeparador(texto[i])) {
                 InsertaHisto(tolower(texto[i]));
+                palabra.push_back(tolower(texto[i]));
+            }
+            else{
+                Determinar(palabra);
+                palabra = "";
             }
         }
         imprimeHistograma();
@@ -526,6 +671,11 @@ void procesamiento_de_texto_apha(int respuesta1, int respuesta2){
         for (int i = 0; i<texto.size(); i++){
             if (not EsSeparador(texto[i])) {
                 InsertaHisto(texto[i]);
+                palabra.push_back(texto[i]);
+            }
+            else{
+                Determinar(palabra);
+                palabra = "";
             }
         }
         imprimeHistograma();
