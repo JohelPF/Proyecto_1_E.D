@@ -512,6 +512,19 @@ void escritura_archivo(){
         archivo << palabras.at(h) << "\t";
     }
     archivo << "\n" << "\n";
+    for (pair<string, int> encontro : raiz.TablaHash) {
+        archivo << encontro.first << " con " << encontro.second << " ocurrencias" << endl;
+        Posicion *recorrido = primpos;
+        while (true){
+            if (recorrido->palabra == encontro.first){
+                for (int i = 0; i<recorrido->posicion.size() ; i++){
+                    archivo << "Encontrado en linea: " << recorrido->linea[i] << " en la posicion: " << recorrido->posicion[i] << endl;
+                }
+                break;
+            }
+            recorrido = recorrido->siguiente;
+        }
+    }
     archivo.close();
 }
 void procesamiento_de_estandar(int respuesta1, int respuesta2){
@@ -570,7 +583,6 @@ void procesamiento_de_estandar(int respuesta1, int respuesta2){
             }
         }
         escritura_archivo();
-        MenuSalida();
     }
     else if (respuesta1 == 0 && respuesta2 == 0){
         for (int i = 0; i<texto.size(); i++){
@@ -599,7 +611,6 @@ void procesamiento_de_estandar(int respuesta1, int respuesta2){
             }
         }
         escritura_archivo();
-        MenuSalida();
     }
     else if (respuesta1 ==1 && respuesta2 == 0){
         for (int i = 0; i<texto.size(); i++){
@@ -715,7 +726,6 @@ void procesamiento_de_estandar_alpha(int respuesta1, int respuesta2){
             }
         }
         escritura_archivo();
-        MenuSalida();
     }
     else if (respuesta1 == 0 && respuesta2 == 0){
         for (int i = 0; i<texto.size(); i++){
@@ -747,7 +757,6 @@ void procesamiento_de_estandar_alpha(int respuesta1, int respuesta2){
             }
         }
         escritura_archivo();
-        MenuSalida();
     }
     else if (respuesta1 ==1 && respuesta2 == 0){
         for (int i = 0; i<texto.size(); i++){
@@ -846,7 +855,6 @@ void procesamiento_de_texto(int respuesta1, int respuesta2){
             }
         }
         escritura_archivo();
-        MenuSalida();
     }
     else if (respuesta1 == 0 && respuesta2 == 0){
         for (int i = 0; i<texto.size(); i++){
@@ -875,7 +883,6 @@ void procesamiento_de_texto(int respuesta1, int respuesta2){
             }
         }
         escritura_archivo();
-        MenuSalida();
     }
     else if (respuesta1 ==1 && respuesta2 == 0){
         for (int i = 0; i<texto.size(); i++){
@@ -970,7 +977,6 @@ void procesamiento_de_texto_apha(int respuesta1, int respuesta2){
             }
         }
         escritura_archivo();
-        MenuSalida();
     }
     else if (respuesta1 == 0 && respuesta2 == 0){
         for (int i = 0; i<texto.size(); i++){
@@ -1002,7 +1008,6 @@ void procesamiento_de_texto_apha(int respuesta1, int respuesta2){
             }
         }
         escritura_archivo();
-        MenuSalida();
     }
     else if (respuesta1 ==1 && respuesta2 == 0){
         for (int i = 0; i<texto.size(); i++){
