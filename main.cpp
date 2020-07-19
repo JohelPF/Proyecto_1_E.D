@@ -10,6 +10,75 @@
 #include <set>
 using namespace std;
 double tiempo;
+/*Inicio de las posiciones*/
+typedef struct _Posicion{
+    string palabra;
+    vector<int> linea;
+    vector<int> posicion;
+    _Posicion *siguiente = NULL;
+}Posicion;
+Posicion *primpos = NULL;
+bool EnPosicion(string palabra){
+    Posicion *recorrido = primpos;
+    while (true){
+        if (recorrido->palabra == palabra){
+            return true;
+        }
+        else if (recorrido->siguiente == NULL){
+            return false;
+        }
+        recorrido = recorrido->siguiente;
+    }
+}
+void InsteraPos(int linea,int posicion,string palabra){
+    if (primpos = NULL){
+        primpos = new Posicion ();
+        primpos->palabra = palabra;
+        primpos->linea[0] = linea;
+        primpos->posicion[0] = posicion;
+    } else{
+        Posicion *recorrido = primpos;
+        while (true){
+            if (recorrido->siguiente == NULL){
+                recorrido->siguiente = new Posicion ();
+                recorrido->siguiente->palabra = palabra;
+                recorrido->siguiente->posicion[0] = posicion;
+                recorrido->siguiente->linea[0] = linea;
+            }
+            recorrido = recorrido->siguiente;
+        }
+    }
+}
+void InsertaNuevaPos(string palabra,int linea,int posicion){
+    Posicion *recorrido = primpos;
+    while (true){
+        if (recorrido->palabra == palabra){
+            recorrido->linea[recorrido->linea.size()] = linea;
+            recorrido->posicion[recorrido->posicion.size()] = posicion;
+        }
+        recorrido = recorrido->siguiente;
+    }
+}
+void DecidePos(string palabra,int linea, int posicion){
+    if (EnPosicion(palabra)){
+        InsertaNuevaPos(palabra,linea,posicion);
+    } else{
+        InsteraPos(linea,posicion,palabra);
+    }
+}
+void RetornaPosiciones(string palabra){
+    Posicion *recorrido = primpos;
+    while (true){
+        if (recorrido->palabra == palabra){
+            for (int i = 0; i<recorrido->posicion.size() ; i++){
+                cout << "Encontrado en linea: " << recorrido->linea[i] << " en la posicion: " << recorrido->posicion[i] << endl;
+            }
+            break;
+        }
+        recorrido = recorrido->siguiente;
+    }
+}
+/*-------------------------------------*/
 
 /*Inicio del las palabras no delimitadoras y sus operaciones*/
 typedef struct _Nodelim{
