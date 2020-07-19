@@ -1,4 +1,3 @@
-
 #include <iostream>
 #include <sstream>
 #include <fstream>
@@ -82,11 +81,11 @@ void RetornaPosiciones(string palabra){
 
 /*Inicio del las palabras no delimitadoras y sus operaciones*/
 typedef struct _Nodelim{
-    set<string> tree;
+    set<char> tree;
 }Nodelim;
 Nodelim PalabrasNoDelimitadoras;
-bool BuscaNodelim(string word){
-    set<string>::iterator it;
+bool BuscaNodelim(char word){
+    set<char>::iterator it;
     for (it=PalabrasNoDelimitadoras.tree.begin(); it != PalabrasNoDelimitadoras.tree.end(); it++){
         if (*it == word){
             return true;
@@ -94,10 +93,10 @@ bool BuscaNodelim(string word){
     }
     return false;
 }
-void InsertaNodelim(string word){
+void InsertaNodelim(char word){
     PalabrasNoDelimitadoras.tree.insert(word);
 }
-void RemueveNodelim(string word){
+void RemueveNodelim(char word){
     PalabrasNoDelimitadoras.tree.erase(word);
 }
 /*-------------------------------------*/
@@ -202,6 +201,13 @@ void DevuelveHash(){
     }
     return;
 }
+void DevuelveHashPos(){
+    for (pair<string, int> encontro : raiz.TablaHash) {
+        cout << encontro.first << " con " << encontro.second << " ocurrencias" << endl;
+        RetornaPosiciones(encontro.first);
+    }
+    return;
+}
 void AgregarOcurrencia(string palabra){
     auto puntero = raiz.TablaHash.find(palabra);
     puntero->second = puntero->second+1;
@@ -227,7 +233,9 @@ string EncPalabra(string palabra){
         return "Esta palabra no se encuentra";
     }
     else{
-        return encontro->first + " con " + to_string(encontro->second) + " ocurrencias" + '\n';
+        cout << encontro->first + " con " + to_string(encontro->second) + " ocurrencias" + '\n';
+        RetornaPosiciones(palabra);
+        return "";
     }
 }
 void EncPrefijo(string prefijo, int tamanno){
@@ -366,18 +374,7 @@ void imprimeHistograma(){
     cout << "\n" << "\n";
 
 }
-/*void posiciones(){
-    string palabra;
-    int posicion;
-    for(int i = 0; i < max; i++){
-        if(not EsSeparador(texto[i])){
-            palabra.push_back(texto[i]);
-        }else{
-            posicion = i - (palabra.size() - 1);
-            palabra = "";
-        }
-    }
-}*/
+
 /*-------------------------------------*/
 void MenuSalida(){
     string respuesta;
@@ -399,7 +396,7 @@ void MenuSalida(){
             DevuelveHash();
         else if (respuesta == "3"){
             DevuelveHash();
-            //posiciones();
+            DevuelveHashPos();
         }
         else if (respuesta == "4") {
             cout << "Digite la palabra a buscar" << endl;
@@ -499,6 +496,10 @@ void procesamiento_de_estandar(int respuesta1, int respuesta2){
     int  maxX = 0;
     char ch, entero;
     string palabra;
+    int linea = 1;
+    int posicion = 1;
+    int resta = 0;
+    int temp;
 
     initscr();			/* Empieza el modo curses		*/
     raw();				/* Line buffering inhabilitado	*/
@@ -521,12 +522,23 @@ void procesamiento_de_estandar(int respuesta1, int respuesta2){
     endwin(); //Cerramos la ventana
     if (respuesta1 == 0 && respuesta2 == 1){
         for (int i = 0; i<texto.size(); i++){
-            if (not EsSeparador(texto[i])) {
+            if (texto[i] == 10){
+                linea+=1;
+                posicion = 1;
+                resta = 0;
+            }
+            else if (not EsSeparador(texto[i])) {
                 InsertaHisto(texto[i]);
                 palabra.push_back(texto[i]);
+                resta += 1;
+                posicion +=1;
             }
             else{
+                temp = posicion - resta;
+                resta = 0;
+                posicion +=1;
                 Determinar(palabra);
+                DecidePos(palabra,linea,temp);
                 palabra = "";
             }
         }
@@ -535,12 +547,23 @@ void procesamiento_de_estandar(int respuesta1, int respuesta2){
     }
     else if (respuesta1 == 0 && respuesta2 == 0){
         for (int i = 0; i<texto.size(); i++){
-            if (not EsSeparador(texto[i])) {
+            if (texto[i] == 10){
+                linea+=1;
+                posicion = 1;
+                resta = 0;
+            }
+            else if (not EsSeparador(texto[i])) {
                 InsertaHisto(tolower(texto[i]));
                 palabra.push_back(texto[i]);
+                resta += 1;
+                posicion +=1;
             }
             else{
+                temp = posicion - resta;
+                resta = 0;
+                posicion +=1;
                 Determinar(palabra);
+                DecidePos(palabra,linea,temp);
                 palabra = "";
             }
         }
@@ -549,24 +572,46 @@ void procesamiento_de_estandar(int respuesta1, int respuesta2){
     }
     else if (respuesta1 ==1 && respuesta2 == 0){
         for (int i = 0; i<texto.size(); i++){
-            if (not EsSeparador(texto[i])) {
+            if (texto[i] == 10){
+                linea+=1;
+                posicion = 1;
+                resta = 0;
+            }
+            else if (not EsSeparador(texto[i])) {
                 InsertaHisto(tolower(texto[i]));
                 palabra.push_back(texto[i]);
+                resta += 1;
+                posicion +=1;
             }
             else{
+                temp = posicion - resta;
+                resta = 0;
+                posicion +=1;
                 Determinar(palabra);
+                DecidePos(palabra,linea,temp);
                 palabra = "";
             }
         }
         MenuSalida();
     } else{
         for (int i = 0; i<texto.size(); i++){
-            if (not EsSeparador(texto[i])) {
+            if (texto[i] == 10){
+                linea+=1;
+                posicion = 1;
+                resta = 0;
+            }
+            else if (not EsSeparador(texto[i])) {
                 InsertaHisto(texto[i]);
                 palabra.push_back(texto[i]);
+                resta += 1;
+                posicion +=1;
             }
             else{
+                temp = posicion - resta;
+                resta = 0;
+                posicion +=1;
                 Determinar(palabra);
+                DecidePos(palabra,linea,temp);
                 palabra = "";
             }
         }
@@ -579,6 +624,10 @@ void procesamiento_de_estandar_alpha(int respuesta1, int respuesta2){
     int  maxX;
     char ch, entero;
     string palabra;
+    int linea = 1;
+    int posicion = 1;
+    int resta = 0;
+    int temp;
 
     initscr();			/* Empieza el modo curses		*/
     raw();				/* Line buffering inhabilitado	*/
@@ -599,14 +648,23 @@ void procesamiento_de_estandar_alpha(int respuesta1, int respuesta2){
     endwin(); //Cerramos la ventana
     if (respuesta1 == 0 && respuesta2 == 1){
         for (int i = 0; i<texto.size(); i++){
-            if (not EsSeparador(texto[i])) {
+            if (texto[i] == 10){
+                linea+=1;
+                posicion = 1;
+                resta = 0;
+            }
+            else if (BuscaNodelim(texto[i])) {
                 InsertaHisto(texto[i]);
                 palabra.push_back(texto[i]);
+                resta += 1;
+                posicion +=1;
             }
             else{
-                if(BuscaNodelim(palabra)){
-                    Determinar(palabra);
-                }
+                temp = posicion - resta;
+                resta = 0;
+                posicion +=1;
+                Determinar(palabra);
+                DecidePos(palabra,linea,temp);
                 palabra = "";
             }
         }
@@ -615,14 +673,23 @@ void procesamiento_de_estandar_alpha(int respuesta1, int respuesta2){
     }
     else if (respuesta1 == 0 && respuesta2 == 0){
         for (int i = 0; i<texto.size(); i++){
-            if (not EsSeparador(texto[i])) {
+            if (texto[i] == 10){
+                linea+=1;
+                posicion = 1;
+                resta = 0;
+            }
+            if (BuscaNodelim(texto[i])) {
                 InsertaHisto(tolower(texto[i]));
                 palabra.push_back(tolower(texto[i]));
+                resta += 1;
+                posicion +=1;
             }
             else{
-                if(BuscaNodelim(palabra)){
-                    Determinar(palabra);
-                }
+                temp = posicion - resta;
+                resta = 0;
+                posicion +=1;
+                Determinar(palabra);
+                DecidePos(palabra,linea,temp);
                 palabra = "";
             }
         }
@@ -631,28 +698,46 @@ void procesamiento_de_estandar_alpha(int respuesta1, int respuesta2){
     }
     else if (respuesta1 ==1 && respuesta2 == 0){
         for (int i = 0; i<texto.size(); i++){
-            if (not EsSeparador(texto[i])) {
+            if (texto[i] == 10){
+                linea+=1;
+                posicion = 1;
+                resta = 0;
+            }
+            else if (BuscaNodelim(texto[i])) {
                 InsertaHisto(tolower(texto[i]));
                 palabra.push_back(tolower(texto[i]));
+                resta += 1;
+                posicion +=1;
             }
             else{
-                if(BuscaNodelim(palabra)){
-                    Determinar(palabra);
-                }
+                temp = posicion - resta;
+                resta = 0;
+                posicion +=1;
+                Determinar(palabra);
+                DecidePos(palabra,linea,temp);
                 palabra = "";
             }
         }
         MenuSalida();
     } else{
         for (int i = 0; i<texto.size(); i++){
-            if (not EsSeparador(texto[i])) {
+            if (texto[i] == 10){
+                linea+=1;
+                posicion = 1;
+                resta = 0;
+            }
+            else if (BuscaNodelim(texto[i])) {
                 InsertaHisto(texto[i]);
                 palabra.push_back(texto[i]);
+                resta += 1;
+                posicion +=1;
             }
             else{
-                if(BuscaNodelim(palabra)){
-                    Determinar(palabra);
-                }
+                temp = posicion - resta;
+                resta = 0;
+                posicion +=1;
+                Determinar(palabra);
+                DecidePos(palabra,linea,temp);
                 palabra = "";
             }
         }
@@ -662,14 +747,29 @@ void procesamiento_de_estandar_alpha(int respuesta1, int respuesta2){
 void procesamiento_de_texto(int respuesta1, int respuesta2){
     string texto = lectura_archivo();
     string palabra;
+    int linea = 1;
+    int posicion = 1;
+    int resta = 0;
+    int temp;
     if (respuesta1 == 0 && respuesta2 == 1){
         for (int i = 0; i<texto.size(); i++){
-            if (not EsSeparador(texto[i])) {
+            if (texto[i] == 10){
+                linea+=1;
+                posicion = 1;
+                resta = 0;
+            }
+            else if (not EsSeparador(texto[i])) {
                 InsertaHisto(texto[i]);
                 palabra.push_back(texto[i]);
+                resta += 1;
+                posicion +=1;
             }
             else{
+                temp = posicion - resta;
+                resta = 0;
+                posicion +=1;
                 Determinar(palabra);
+                DecidePos(palabra,linea,temp);
                 palabra = "";
             }
         }
@@ -678,12 +778,23 @@ void procesamiento_de_texto(int respuesta1, int respuesta2){
     }
     else if (respuesta1 == 0 && respuesta2 == 0){
         for (int i = 0; i<texto.size(); i++){
-            if (not EsSeparador(texto[i])) {
+            if (texto[i] == 10){
+                linea+=1;
+                posicion = 1;
+                resta = 0;
+            }
+            else if (not EsSeparador(texto[i])) {
                 InsertaHisto(tolower(texto[i]));
                 palabra.push_back(tolower(texto[i]));
+                resta += 1;
+                posicion +=1;
             }
             else{
+                temp = posicion - resta;
+                resta = 0;
+                posicion +=1;
                 Determinar(palabra);
+                DecidePos(palabra,linea,temp);
                 palabra = "";
             }
         }
@@ -692,24 +803,46 @@ void procesamiento_de_texto(int respuesta1, int respuesta2){
     }
     else if (respuesta1 ==1 && respuesta2 == 0){
         for (int i = 0; i<texto.size(); i++){
-            if (not EsSeparador(texto[i])) {
+            if (texto[i] == 10){
+                linea+=1;
+                posicion = 1;
+                resta = 0;
+            }
+            else if (not EsSeparador(texto[i])) {
                 InsertaHisto(tolower(texto[i]));
                 palabra.push_back(tolower(texto[i]));
+                resta += 1;
+                posicion +=1;
             }
             else{
+                temp = posicion - resta;
+                resta = 0;
+                posicion +=1;
                 Determinar(palabra);
+                DecidePos(palabra,linea,temp);
                 palabra = "";
             }
         }
         MenuSalida();
     } else{
         for (int i = 0; i<texto.size(); i++){
-            if (not EsSeparador(texto[i])) {
+            if (texto[i] == 10){
+                linea+=1;
+                posicion = 1;
+                resta = 0;
+            }
+            else if (not EsSeparador(texto[i])) {
                 InsertaHisto(texto[i]);
                 palabra.push_back(texto[i]);
+                resta += 1;
+                posicion +=1;
             }
             else{
+                temp = posicion - resta;
+                resta = 0;
+                posicion +=1;
                 Determinar(palabra);
+                DecidePos(palabra,linea,temp);
                 palabra = "";
             }
         }
@@ -719,16 +852,29 @@ void procesamiento_de_texto(int respuesta1, int respuesta2){
 void procesamiento_de_texto_apha(int respuesta1, int respuesta2){
     string texto = lectura_archivo();
     string palabra;
+    int linea = 1;
+    int posicion = 1;
+    int resta = 0;
+    int temp;
     if (respuesta1 == 0 && respuesta2 == 1){
         for (int i = 0; i<texto.size(); i++){
-            if (not EsSeparador(texto[i])) {
+            if (texto[i] == 10){
+                linea+=1;
+                posicion = 1;
+                resta = 0;
+            }
+            else if (BuscaNodelim(texto[i])) {
                 InsertaHisto(texto[i]);
                 palabra.push_back(texto[i]);
+                resta += 1;
+                posicion +=1;
             }
             else{
-                if(BuscaNodelim(palabra)){
-                    Determinar(palabra);
-                }
+                temp = posicion - resta;
+                resta = 0;
+                posicion +=1;
+                Determinar(palabra);
+                DecidePos(palabra,linea,temp);
                 palabra = "";
             }
         }
@@ -737,14 +883,23 @@ void procesamiento_de_texto_apha(int respuesta1, int respuesta2){
     }
     else if (respuesta1 == 0 && respuesta2 == 0){
         for (int i = 0; i<texto.size(); i++){
-            if (not EsSeparador(texto[i])) {
+            if (texto[i] == 10){
+                linea+=1;
+                posicion = 1;
+                resta = 0;
+            }
+           else if (BuscaNodelim(texto[i])) {
                 InsertaHisto(tolower(texto[i]));
                 palabra.push_back(tolower(texto[i]));
+                resta += 1;
+                posicion +=1;
             }
             else{
-                if(BuscaNodelim(palabra)){
-                    Determinar(palabra);
-                }
+                temp = posicion - resta;
+                resta = 0;
+                posicion +=1;
+                Determinar(palabra);
+                DecidePos(palabra,linea,temp);
                 palabra = "";
             }
         }
@@ -753,28 +908,44 @@ void procesamiento_de_texto_apha(int respuesta1, int respuesta2){
     }
     else if (respuesta1 ==1 && respuesta2 == 0){
         for (int i = 0; i<texto.size(); i++){
-            if (not EsSeparador(texto[i])) {
+            if (texto[i] == 10){
+                linea+=1;
+                posicion = 1;
+                resta = 0;
+            }
+            else if (BuscaNodelim(texto[i])) {
                 InsertaHisto(tolower(texto[i]));
                 palabra.push_back(tolower(texto[i]));
+                resta += 1;
+                posicion +=1;
             }
             else{
-                if(BuscaNodelim(palabra)){
-                    Determinar(palabra);
-                }
+                temp = posicion - resta;
+                resta = 0;
+                posicion +=1;
+                Determinar(palabra);
+                DecidePos(palabra,linea,temp);
                 palabra = "";
             }
         }
         MenuSalida();
     } else{
         for (int i = 0; i<texto.size(); i++){
-            if (not EsSeparador(texto[i])) {
+            if (texto[i] == 10){
+                linea+=1;
+                posicion = 1;
+                resta = 0;
+            }
+            else if (BuscaNodelim(texto[i])) {
                 InsertaHisto(texto[i]);
                 palabra.push_back(texto[i]);
             }
             else{
-                if(BuscaNodelim(palabra)){
-                    Determinar(palabra);
-                }
+                temp = posicion - resta;
+                resta = 0;
+                posicion +=1;
+                Determinar(palabra);
+                DecidePos(palabra,linea,temp);
                 palabra = "";
             }
         }
@@ -833,14 +1004,14 @@ void RemoverSeparador(){
     RemueveSep(sep);
 }
 void NewNodelim(){
-    string palabra;
-    cout << "Digite la palabra a ser añadida" << endl;
+    char palabra;
+    cout << "Digite la letra a ser añadida" << endl;
     cin >> palabra;
     InsertaNodelim(palabra);
 }
 void RemNodelim(){
-    string palabra;
-    cout << "Digite la palabra a ser removida" << endl;
+    char palabra;
+    cout << "Digite la letra a ser removida" << endl;
     cin >> palabra;
     RemueveNodelim(palabra);
 }
@@ -853,8 +1024,8 @@ int main() {
         cout << "2-Digite para procesar desde un archivo de texto" << endl;
         cout << "3-Digite para ingresar un separador" << endl;
         cout << "4-Digite para remover un separador" << endl;
-        cout << "5-Digite para ingresar una palabra la cual no se va a tomar en cuenta como un separador" << endl;
-        cout << "6-Digite para remover una palabra la cual no se va a tomar en cuenta como un separador" << endl;
+        cout << "5-Digite para ingresar una letra al alfabeto" << endl;
+        cout << "6-Digite para remover una letra del alfabeto" << endl;
         cout << "7-Digite para salir" << endl;
         cin >> respuesta;
         string palabra;
